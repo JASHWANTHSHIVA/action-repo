@@ -10,8 +10,8 @@ on:
 
 jobs:
   notify-pull-request:
-    # Runs only for PR opened/reopened/synchronize (not merged close)
-    if: github.event.action != 'closed' || github.event.pull_request.merged == false
+    # Runs only for PR opened/reopened/synchronize (not when closed)
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
 
     steps:
