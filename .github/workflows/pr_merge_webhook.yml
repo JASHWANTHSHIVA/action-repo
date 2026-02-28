@@ -1,0 +1,64 @@
+name: PR and Merge Webhook Notifier
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
+
+jobs:
+  notify-pull-request:
+    # Runs only for PR opened/reopened/synchronize (not merged close)
+    if: github.event.action != 'closed' || github.event.pull_request.merged == false
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Pull Request Event to Webhook
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        run: |
+          TIMESTAMP=$(date -u +"%d %B %Y - %I:%M %p UTC")
+          FROM_BRANCH="${{ github.event.pull_request.head.ref }}"
+          TO_BRANCH="${{ github.event.pull_request.base.ref }}"
+          AUTHOR="${{ github.actor }}"
+          REQUEST_ID="PR-${{ github.event.pull_request.number }}"
+
+          curl -X POST "$WEBHOOK_URL/webhook" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"request_id\": \"$REQUEST_ID\",
+              \"author\": \"$AUTHOR\",
+              \"action\": \"PULL_REQUEST\",
+              \"from_branch\": \"$FROM_BRANCH\",
+              \"to_branch\": \"$TO_BRANCH\",
+              \"timestamp\": \"$TIMESTAMP\"
+            }"
+
+  notify-merge:
+    # Bonus: Runs only when a PR is merged (closed + merged=true)
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Merge Event to Webhook
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        run: |
+          TIMESTAMP=$(date -u +"%d %B %Y - %I:%M %p UTC")
+          FROM_BRANCH="${{ github.event.pull_request.head.ref }}"
+          TO_BRANCH="${{ github.event.pull_request.base.ref }}"
+          AUTHOR="${{ github.actor }}"
+          REQUEST_ID="PR-${{ github.event.pull_request.number }}"
+
+          curl -X POST "$WEBHOOK_URL/webhook" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"request_id\": \"$REQUEST_ID\",
+              \"author\": \"$AUTHOR\",
+              \"action\": \"MERGE\",
+              \"from_branch\": \"$FROM_BRANCH\",
+              \"to_branch\": \"$TO_BRANCH\",
+              \"timestamp\": \"$TIMESTAMP\"
+            }"
