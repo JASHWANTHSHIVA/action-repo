@@ -1,0 +1,31 @@
+name: Push Webhook Notifier
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  notify-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Push Event to Webhook
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        run: |
+          TIMESTAMP=$(date -u +"%d %B %Y - %I:%M %p UTC")
+          TO_BRANCH="${GITHUB_REF_NAME}"
+          AUTHOR="${GITHUB_ACTOR}"
+          REQUEST_ID="${GITHUB_SHA}"
+
+          curl -X POST "$WEBHOOK_URL/webhook" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"request_id\": \"$REQUEST_ID\",
+              \"author\": \"$AUTHOR\",
+              \"action\": \"PUSH\",
+              \"from_branch\": \"$TO_BRANCH\",
+              \"to_branch\": \"$TO_BRANCH\",
+              \"timestamp\": \"$TIMESTAMP\"
+            }"
