@@ -19,7 +19,7 @@ jobs:
         env:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
         run: |
-          TIMESTAMP=$(date -u +"%d %B %Y - %I:%M %p UTC")
+          TIMESTAMP=$(TZ='Asia/Kolkata' date +"%d %B %Y - %I:%M %p IST")
           FROM_BRANCH="${{ github.event.pull_request.head.ref }}"
           TO_BRANCH="${{ github.event.pull_request.base.ref }}"
           AUTHOR="${{ github.actor }}"
@@ -46,7 +46,7 @@ jobs:
         env:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
         run: |
-          TIMESTAMP=$(date -u +"%d %B %Y - %I:%M %p UTC")
+          TIMESTAMP=$(TZ='Asia/Kolkata' date +"%d %B %Y - %I:%M %p IST")
           FROM_BRANCH="${{ github.event.pull_request.head.ref }}"
           TO_BRANCH="${{ github.event.pull_request.base.ref }}"
           AUTHOR="${{ github.actor }}"

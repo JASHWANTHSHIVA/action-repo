@@ -14,7 +14,7 @@ jobs:
         env:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
         run: |
-          TIMESTAMP=$(date -u +"%d %B %Y - %I:%M %p UTC")
+          TIMESTAMP=$(TZ='Asia/Kolkata' date +"%d %B %Y - %I:%M %p IST")
           TO_BRANCH="${GITHUB_REF_NAME}"
           AUTHOR="${GITHUB_ACTOR}"
           REQUEST_ID="${GITHUB_SHA}"
